@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatPrice } from "@/lib/utils";
 import { AddToCartButton } from "./AddToCartButton";
-import { StockBadge } from "./StockBadge";
+import { StockBadge } from "../StockBadge";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];

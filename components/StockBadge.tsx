@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { useCartItem } from "./cart-store-provider";
+import { useCartItem } from "@/lib/store/cart-store-provider";
 import { cn } from "@/lib/utils";
 import { isLowStock as checkLowStock } from "@/lib/constants/stock";
 

@@ -3,7 +3,7 @@
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useCartActions, useCartItem } from "./cart-store-provider";
+import { useCartActions, useCartItem } from "../../lib/store/cart-store-provider";
 import { cn } from "@/lib/utils";
 
 interface AddToCartButtonProps {
