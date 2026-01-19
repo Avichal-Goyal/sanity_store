@@ -13,7 +13,9 @@ import { FeaturedCarousel } from "@/components/homePage/FeaturedCarousel";
 import { CategoryTiles } from "@/components/homePage/CategoryTiles";
 import { ProductSection } from "@/components/homePage/ProductSection";
 
-// import { ProductSection } from "@/components/app/ProductSection";
+import { CartSheet } from "@/components/cart/CartSheet";
+import { CartTrigger } from "@/components/cart/CartTrigger";
+
 
 interface PageProps {
   searchParams: Promise<{
@@ -86,7 +88,14 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
 
+
+
     <div className="">
+
+      <div className="fixed top-4 right-4 z-50">
+        <CartTrigger />
+      </div>
+
       {/* Featured Products Carousel */}
 
       <Suspense fallback={<div>Loading...</div>}>
@@ -130,3 +139,5 @@ export default async function Home({ searchParams }: PageProps) {
     </div>
   );
 }
+
+
