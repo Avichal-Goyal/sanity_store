@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     try {
         const { userId } = await auth();
         if(!userId) return new NextResponse("Unauthorized", { status: 401 });
-        //get the data sent from frontend
+      
         const body = await request.json();
         const { amount, cartItems, userdetails } = body;
 
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({
-            razorpayOrderId: razorpayOrder.offer_id,
+            razorpayOrderId: razorpayOrder.id,
             sanityOrderId: sanityOrder._id,
             amount: razorpayOrder
         });

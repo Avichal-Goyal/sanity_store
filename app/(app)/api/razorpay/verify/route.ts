@@ -1,39 +1,60 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { client } from "@/sanity/lib/client";
+import { sendMail } from "@/lib/mail";
+import { orderConfirmationTemplate } from "@/lib/templates/order-confirmation";
 
 export async function POST(req: Request) {
-    const {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-        sanity_order_id
-    } = await req.json();
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    sanity_order_id,
+  } = await req.json();
 
-    // Create the signature string
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
 
-    // Hash it using the Razorpay Secret Key
-    const expectedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-        .update(body.toString())
-        .digest("hex");
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+    .update(body)
+    .digest("hex");
 
-    // Compare signatures
-    const isAuthentic = expectedSignature === razorpay_signature;
+  if (expectedSignature !== razorpay_signature) {
+    return NextResponse.json(
+      { error: "Invalid signature" },
+      { status: 400 }
+    );
+  }
 
-    if (isAuthentic) {
-        // Update Sanity status to paid
-        await client
-        .patch(sanity_order_id)
-        .set({
-            status: "paid",
-            rzorpayPaymentId: razorpay_payment_id // You can repurpose this field or add a razorpayPaymentId field
-        })
-        .commit();
+  await client
+    .patch(sanity_order_id)
+    .set({
+      status: "paid",
+      razorpayPaymentId: razorpay_payment_id,
+    })
+    .commit();
 
-        return NextResponse.json({ message: "Payment verified successfully" }, { status: 200 });
-    } else {
-        return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
+  const order = await client.getDocument(sanity_order_id);
+
+  if (!order?.email) {
+    return NextResponse.json(
+      { error: "Order email not found" },
+      { status: 400 }
+    );
+  }
+
+  await sendMail({
+    to: order.email,
+    subject: `Order Confirmed – ${order.orderNumber} 🎉`,
+    html: orderConfirmationTemplate({
+      customerName: order.email.split("@")[0],
+      orderId: order.orderNumber,
+      totalAmount: order.total,
+    }),
+  });
+
+  return NextResponse.json(
+    { message: "Payment verified & email sent" },
+    { status: 200 }
+  );
 }
